@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -46,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
 
 import misc.AppSettings;
 import misc.NetworkCall;
@@ -323,13 +326,21 @@ public class NotificationsFragment extends Fragment {
                         } else {
                             lat = location.getLatitude();
                             lon = location.getLongitude();
+                            try {
+                                Geocoder geocoder = new Geocoder(getActivity());
+                                List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                                Address address = addresses.get(0);
+                                locationText.setText(address.getLocality() + "," + address.getAdminArea());
+                            } catch (Exception e) {
+
+                            }
                             notificationsViewModel.getTemperature(getActivity(), lat, lon).observe(getActivity(), new Observer<String>() {
                                 @Override
                                 public void onChanged(String s) {
                                     temperatureText.setText(s + "°C");
                                 }
                             });
-                            locationText.setText("Lat: " + location.getLatitude() + " Lon: " + location.getLongitude());
+
                         }
                     }
                 });
@@ -373,7 +384,14 @@ public class NotificationsFragment extends Fragment {
                     temperatureText.setText(s + " °C");
                 }
             });
-            locationText.setText("Lat: " + mLastLocation.getLatitude() + " Lon: " + mLastLocation.getLongitude());
+            try {
+                Geocoder geocoder = new Geocoder(getActivity());
+                List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(),mLastLocation.getLongitude(),1);
+                Address address = addresses.get(0);
+                locationText.setText(address.getLocality() + "," + address.getAdminArea());
+            } catch (Exception e) {
+
+            }
         }
     };
 
