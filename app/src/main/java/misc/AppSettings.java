@@ -15,7 +15,9 @@ public class AppSettings {
 
     public static final String setProfileUrl = AppSettings.baseUrl + "/api/setProfile";
 
-    public static final String profilePic = AppSettings.baseUrl + "/uploads/users/profile_pics/";
+    public static final String userPics = AppSettings.baseUrl + "/uploads/users/docs/images/";
+
+    public static final String profilePic = AppSettings.baseUrl + "/uploads/profile/profileImage/";
     public static String eventPartners = AppSettings.baseUrl + "/api/eventPartners";
 
     public static String userFilesUrl = AppSettings.baseUrl + "/api/userFiles";
@@ -27,4 +29,6 @@ public class AppSettings {
     public static String profilePicUpload = AppSettings.baseUrl + "/api/uploadProfilePicture";
 
     public static String eventGallery = AppSettings.baseUrl +"/uploads/event_gallery/images/";
+    public static String videoUpload = AppSettings.baseUrl + "/api/uploadUserVideos";;
+    public static String userImageUpload=AppSettings.baseUrl + "/api/userImageUpload";;
 }

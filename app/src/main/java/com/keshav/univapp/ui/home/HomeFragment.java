@@ -43,7 +43,6 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.List;
 
 import misc.AppSettings;
@@ -192,6 +191,7 @@ public class HomeFragment extends Fragment {
             public void onChanged(List<Sliders> sliders) {
                 ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getActivity(), sliders);
                 viewPager.setAdapter(viewPagerAdapter);
+
             }
         });
         return root;

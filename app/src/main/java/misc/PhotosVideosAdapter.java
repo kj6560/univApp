@@ -62,8 +62,8 @@ public class PhotosVideosAdapter extends RecyclerView.Adapter<PhotosVideosAdapte
         if(type==1){
 
             ImageView iv  = new ImageView(context);
-            Log.d("file_path",AppSettings.profilePic+"/"+images_videos.get(position).file_path);
-            Picasso.get().load(AppSettings.profilePic+"/"+images_videos.get(position).getFile_path()).into(iv);
+            Log.d("file_path",AppSettings.userPics+"/"+images_videos.get(position).file_path);
+            Picasso.get().load(AppSettings.userPics+"/"+images_videos.get(position).getFile_path()).into(iv);
             view.addView(iv);
         }
     }

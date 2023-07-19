@@ -2,13 +2,18 @@ package com.keshav.univapp.ui.home;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.FileUtils;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -47,18 +53,24 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import misc.AppSettings;
 import misc.Category;
 import misc.Event;
 import misc.HomeLIstViewAdapter;
+import misc.NetworkCall;
 import misc.PhotosVideosAdapter;
 import misc.RecyclerViewAdapter;
 import misc.SessionManager;
 import misc.Sliders;
 import misc.UserFiles;
 import misc.ViewPagerAdapter;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class SocialProfileFragment extends Fragment {
     private FragmentSocialProfileBinding binding;
@@ -67,7 +79,7 @@ public class SocialProfileFragment extends Fragment {
     SessionManager sm;
 
     int view_switch = 0;
-
+    int user_id = 0;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         socialProfileModel =
@@ -75,6 +87,7 @@ public class SocialProfileFragment extends Fragment {
 
         binding = FragmentSocialProfileBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        final ImageView addUserFiles = binding.addUserFiles;
         final RecyclerView recyclerView = binding.recyclerView;
         final ImageView circle_imageView = binding.circleImageView;
         final TextView photos = binding.photos;
@@ -83,7 +96,7 @@ public class SocialProfileFragment extends Fragment {
         final TextView profile_name=binding.profileName;
         final TextView abouInfo = binding.aboutInfo;
         sm = new SessionManager(getActivity());
-        int user_id = 0;
+
         try {
             JSONObject job = new JSONObject(sm.getUser());
             Log.d("user", job.toString());
@@ -142,6 +155,18 @@ public class SocialProfileFragment extends Fragment {
 
             }
         });
+
+        addUserFiles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+//                intent.setType("video/*");
+//                startActivityForResult(intent, 100);
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(intent, 100);
+            }
+        });
         sm = new SessionManager(getActivity());
         try {
             JSONObject job = new JSONObject(sm.getUser());
@@ -153,11 +178,60 @@ public class SocialProfileFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 100) {
+                // Get the url from data
+                final Uri selectedImageUri = data.getData();
+                if (null != selectedImageUri) {
+                    // Get the path from the Uri
+                    NetworkCall.uploadImage(getActivity(),new File(getPathFromURI(selectedImageUri)), user_id, new Callback() {
+                        @Override
+                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                            Log.d("exception",e.getMessage());
+                        }
+
+                        @Override
+                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                            Log.d("image uploaded successfully",response.body().string());
+                            getActivity().runOnUiThread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                            );
+                        }
+                    });
+                    // Set the image in ImageView
+
+                }
+            }
+        }
+    }
+
+    public String getPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getActivity().getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        return res;
+    }
     private void getUserFiles(int view_switch, int user_id, RecyclerView recyclerView, int type) {
         socialProfileModel.getUserFiles(getActivity(), user_id, view_switch).observe(getActivity(), new Observer<List<UserFiles>>() {
             @Override
             public void onChanged(List<UserFiles> userFiles) {
-                Log.d("size", "" + userFiles.size());
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), type == 1 ? 3 : 2);
                 recyclerView.setLayoutManager(gridLayoutManager);
                 recyclerView.setAdapter(new PhotosVideosAdapter(getActivity(), userFiles, type));

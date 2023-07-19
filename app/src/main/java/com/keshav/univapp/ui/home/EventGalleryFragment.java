@@ -27,11 +27,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,10 +39,8 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.keshav.univapp.R;
 import com.keshav.univapp.SocialProfile;
 import com.keshav.univapp.VideosActivity;
-import com.keshav.univapp.databinding.FragmentEventDetailsHomeBinding;
 import com.keshav.univapp.databinding.FragmentEventGalleryBinding;
 import com.squareup.picasso.Picasso;
 
@@ -57,7 +52,6 @@ import java.util.List;
 
 import misc.AppSettings;
 import misc.Event;
-import misc.EventPartners;
 import misc.RecyclerViewAdapterEventGallery;
 import misc.SessionManager;
 
@@ -69,6 +63,7 @@ public class EventGalleryFragment extends Fragment {
     double lat, lon;
     int event_id;
     private EventGalleryViewModel mViewModel;
+
 private FragmentEventGalleryBinding binding;
     public static EventGalleryFragment newInstance() {
         return new EventGalleryFragment();
@@ -139,6 +134,7 @@ private FragmentEventGalleryBinding binding;
                 GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
                 recyclerView.setLayoutManager(gridLayoutManager);
                 recyclerView.setAdapter(new RecyclerViewAdapterEventGallery(getActivity(),strings));
+
             }
         });
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -183,7 +179,6 @@ private FragmentEventGalleryBinding binding;
                                     temperatureText.setText(s + "°C");
                                 }
                             });
-                            locationText.setText("Lat: " + location.getLatitude() + " Lon: " + location.getLongitude());
                         }
                     }
                 });

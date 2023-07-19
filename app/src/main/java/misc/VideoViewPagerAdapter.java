@@ -62,7 +62,7 @@ public class VideoViewPagerAdapter extends RecyclerView.Adapter<VideoViewPagerAd
             pb = itemView.findViewById(R.id.progressBar4);
         }
         public void setData(UserFiles obj){
-            videoView.setVideoPath(obj.getFile_path());
+            videoView.setVideoPath("https://www.univsportatech.com/uploads/users/docs/images/"+obj.getFile_path());
             title.setText(obj.getTitle());
             desc.setText(obj.getDescription());
             tags.setText(obj.getTags());

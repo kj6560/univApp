@@ -47,6 +47,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class NotificationsFragment extends Fragment {
 
     EditText first_name, last_name, phone, email, birthday, gender, married, height, weight, address_line1, city, state, pincode;
 
-    String user_id, first__name, last__name, __email, __number, _birthday, _gender, _married, _height, _weight, _address_line1, _city, _state, _pincode;
+    String user_id, first__name, last__name, __email, __number, _birthday, _gender, _married, _height, _weight, _address_line1, _city, _state, _pincode,_image;
     Button saveDetails;
     double lat, lon;
 
@@ -84,7 +85,8 @@ public class NotificationsFragment extends Fragment {
         sm = new SessionManager(getActivity());
         try {
             JSONObject job = new JSONObject(sm.getUser());
-            Picasso.get().load(AppSettings.profilePic+"/"+job.getString("image")).into(circle_imageView);
+            Log.d("profilepicpath",AppSettings.profilePic+job.getString("image"));
+            Picasso.get().load(AppSettings.profilePic+job.getString("image")).into(circle_imageView);
         }catch (Exception e){
 
         }
@@ -97,7 +99,9 @@ public class NotificationsFragment extends Fragment {
         });
         try {
             JSONObject job = new JSONObject(sm.getUser());
+            Log.d("imageUpload response",job.toString());
             user_id = "" + job.getInt("id");
+            _image = job.getString("image");
             first__name = job.getString("first_name");
             last__name = job.getString("last_name");
             __email = job.getString("email");
@@ -161,6 +165,8 @@ public class NotificationsFragment extends Fragment {
         if (_pincode != null)
             pincode.setText(_pincode);
         saveDetails = binding.saveDetails;
+        if(_image !=null)
+            Picasso.get().load(AppSettings.profilePic+_image).into(circle_profile);
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -259,25 +265,36 @@ public class NotificationsFragment extends Fragment {
 
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (resultCode == Activity.RESULT_OK) {
-                    if (requestCode == 100) {
-                        // Get the url from data
-                        final Uri selectedImageUri = data.getData();
-                        if (null != selectedImageUri) {
-                            // Get the path from the Uri
-                            String path = getPathFromURI(selectedImageUri);
-                            Log.i("imagePath", "Image Path : " + path);
-                            // Set the image in ImageView
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 100) {
+                // Get the url from data
+                final Uri selectedImageUri = data.getData();
+                if (null != selectedImageUri) {
+                    // Get the path from the Uri
+                    NetworkCall.uploadProfilePic(getActivity(),new File(getPathFromURI(selectedImageUri)), Integer.parseInt(user_id), new Callback() {
+                        @Override
+                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                            Log.d("exception",e.getMessage());
+                        }
+
+                        @Override
+                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+                            try{
+                                JSONObject jsonObject = new JSONObject(response.body().string());
+                                JSONObject job = new JSONObject(sm.getUser());
+                                job.put("image",jsonObject.getString("image"));
+                                sm.setUser(job.toString());
+                            }catch (Exception e){
+                                Log.d("user exception",e.getMessage());
+                            }
                             getActivity().runOnUiThread(
                                     new Runnable() {
                                         @Override
                                         public void run() {
-                                            circle_profile.setImageURI(selectedImageUri);
-                                            try {
 
+                                            try {
+                                                circle_profile.setImageURI(selectedImageUri);
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                             }
@@ -285,10 +302,12 @@ public class NotificationsFragment extends Fragment {
                                     }
                             );
                         }
-                    }
+                    });
+                    // Set the image in ImageView
+
                 }
             }
-        }).start();
+        }
 
     }
 

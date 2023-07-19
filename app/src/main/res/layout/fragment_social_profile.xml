@@ -115,9 +115,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:orientation="vertical">
-
+                    android:orientation="horizontal">
                     <ImageView
+                        android:id="@+id/addUserFiles"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/cardview_light_background"
+                        android:src="@android:drawable/ic_input_add" />
+                    <ImageView
+                        android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@android:drawable/ic_menu_preferences" />
@@ -227,6 +234,7 @@
                 android:id="@+id/recyclerView"
                 android:layout_marginBottom="100dp"
                 />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

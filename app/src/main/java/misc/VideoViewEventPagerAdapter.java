@@ -53,8 +53,8 @@ public class VideoViewEventPagerAdapter extends RecyclerView.Adapter<VideoViewEv
             pb = (ProgressBar) itemView.findViewById(R.id.progressBar4);
         }
         public void setData(String obj){
-            Log.d("video path",obj);
-            videoView.setVideoPath(obj);
+            videoView.setVideoPath("https://www.univsportatech.com/uploads/users/docs/images/"+obj);
+            Log.d("vid_path","https://www.univsportatech.com/uploads/users/docs/images/"+obj);
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {

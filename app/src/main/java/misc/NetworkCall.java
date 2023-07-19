@@ -78,33 +78,78 @@ public class NetworkCall {
         return  call;
     }
 
-    private String uploadImage(File imageFile,int user_id) {
+    public static String uploadProfilePic(Context context,File imageFile,int user_id,Callback callback) {
         // Create an instance of OkHttpClient
         OkHttpClient client = new OkHttpClient();
-
         // Create the request body with the image file
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("image", imageFile.getName(), RequestBody.create(MediaType.parse("image/*"), imageFile))
                 .build();
-
+        SessionManager sessionManager = new SessionManager(context);
+        String token = sessionManager.getToken();
         // Create the request
         Request request = new Request.Builder()
                 .url(AppSettings.profilePicUpload+"?user_id="+user_id)
                 .post(requestBody)
+                .addHeader("Authorization", "Bearer " + token)
                 .build();
 
         try {
-            Response response = client.newCall(request).execute();
+            Call call = client.newCall(request);
+            call.enqueue(callback);
+        } catch (Exception e) {
+            Log.d("upload exception", e.getMessage());
+        }
+        return null;
+    }
+    public static String uploadImage(Context context,File imageFile,int user_id,Callback callback) {
+        // Create an instance of OkHttpClient
+        OkHttpClient client = new OkHttpClient();
+        // Create the request body with the image file
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("image", imageFile.getName(), RequestBody.create(MediaType.parse("image/*"), imageFile))
+                .build();
+        SessionManager sessionManager = new SessionManager(context);
+        String token = sessionManager.getToken();
+        // Create the request
+        Request request = new Request.Builder()
+                .url(AppSettings.userImageUpload+"?user_id="+user_id)
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
 
-            if (response.isSuccessful()) {
-                // Image uploaded successfully
-                String responseBody = response.body().string();
-                // Handle the response data as needed
-                return responseBody;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        try {
+            Call call = client.newCall(request);
+            call.enqueue(callback);
+        } catch (Exception e) {
+            Log.d("upload exception", e.getMessage());
+        }
+        return null;
+    }
+    public static String uploadVideo(Context context,File videoFile,int user_id,Callback callback,String title,String description,String tags) {
+        // Create an instance of OkHttpClient
+        OkHttpClient client = new OkHttpClient();
+        // Create the request body with the image file
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("video_file", videoFile.getName(), RequestBody.create(MediaType.parse("video/*"), videoFile))
+                .build();
+        SessionManager sessionManager = new SessionManager(context);
+        String token = sessionManager.getToken();
+        // Create the request
+        Request request = new Request.Builder()
+                .url(AppSettings.videoUpload+"?user_id="+user_id+"&title="+title+"&description="+description+"&tags="+tags)
+                .post(requestBody)
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
+
+        try {
+            Call call = client.newCall(request);
+            call.enqueue(callback);
+        } catch (Exception e) {
+            Log.d("upload exception", e.getMessage());
         }
         return null;
     }
