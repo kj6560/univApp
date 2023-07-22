@@ -2,13 +2,14 @@ package com.keshav.univapp;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -106,8 +107,16 @@ public class VideosActivity extends AppCompatActivity {
                                                 @Override
                                                 public void run() {
                                                     try {
-                                                        Intent i = new Intent(VideosActivity.this, SocialProfile.class);
-                                                        startActivity(i);
+                                                        AlertDialog.Builder adb = new AlertDialog.Builder(VideosActivity.this);
+                                                        adb.setCancelable(false);
+                                                        adb.setMessage("Video Upload Successful");
+                                                        adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface1, int i) {
+                                                                dialogInterface1.dismiss();
+                                                            }
+                                                        });
+                                                        adb.show();
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                     }

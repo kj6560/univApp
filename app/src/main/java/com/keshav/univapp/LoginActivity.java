@@ -1,6 +1,8 @@
 package com.keshav.univapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -60,22 +62,49 @@ public class LoginActivity extends Activity {
                     NetworkCall.post(AppSettings.loginUrl, jsonObject.toString(),LoginActivity.this, new Callback() {
                         @Override
                         public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
+                            Log.d("login","reached here");
                         }
 
                         @Override
                         public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                             try {
                                 JSONObject job = new JSONObject(response.body().string());
-                                String _token = job.getString("token");
-                                JSONObject job1 = job.getJSONObject("user");
-                                SessionManager sm = new SessionManager(LoginActivity.this);
-                                sm.login(_token,job1.toString());
-                                AppPreferences appPreferences = new AppPreferences(LoginActivity.this);
-                                appPreferences.setPreference("showWelcome","no");
-                                pb.setVisibility(View.INVISIBLE);
-                                Intent i = new Intent(LoginActivity.this,NewHomeActivity.class);
-                                startActivity(i);
+                                if(!job.has("error")){
+                                    String _token = job.getString("token");
+                                    JSONObject job1 = job.getJSONObject("user");
+                                    SessionManager sm = new SessionManager(LoginActivity.this);
+                                    sm.login(_token,job1.toString());
+                                    AppPreferences appPreferences = new AppPreferences(LoginActivity.this);
+                                    appPreferences.setPreference("showWelcome","no");
+                                    runOnUiThread(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    pb.setVisibility(View.INVISIBLE);
+                                                    Intent i = new Intent(LoginActivity.this,NewHomeActivity.class);
+                                                    startActivity(i);
+                                                }
+                                            }
+                                    );
+                                }else{
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            pb.setVisibility(View.INVISIBLE);
+                                            AlertDialog.Builder adb = new AlertDialog.Builder(LoginActivity.this);
+                                            adb.setMessage("Login Failed!!\nPlease check your credentials and try again");
+                                            adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    dialogInterface.dismiss();
+                                                }
+                                            });
+                                            adb.setCancelable(false);
+                                            adb.show();
+                                        }
+                                    });
+                                }
+
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
                             }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -41,6 +43,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.keshav.univapp.NewHomeActivity;
 import com.keshav.univapp.SocialProfile;
+import com.keshav.univapp.VideosActivity;
 import com.keshav.univapp.databinding.FragmentNotificationsBinding;
 import com.squareup.picasso.Picasso;
 
@@ -240,8 +243,18 @@ public class NotificationsFragment extends Fragment {
                                 JSONObject job = new JSONObject(response.body().string());
                                 JSONObject job1 = job.getJSONObject("user");
                                 sm.setUser(job1.toString());
-                                Intent i = new Intent(getActivity(), NewHomeActivity.class);
-                                getActivity().startActivity(i);
+                                AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
+                                adb.setCancelable(false);
+                                adb.setMessage("Profile Updated");
+                                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface1, int i) {
+                                        Intent i1 = new Intent(getActivity(), NewHomeActivity.class);
+                                        getActivity().startActivity(i1);
+                                    }
+                                });
+                                adb.show();
+
                             } catch (Exception e) {
                                 Log.d("update user profile", "" + e.getMessage());
                             }
@@ -294,7 +307,16 @@ public class NotificationsFragment extends Fragment {
                                         public void run() {
 
                                             try {
-                                                circle_profile.setImageURI(selectedImageUri);
+                                                AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
+                                                adb.setCancelable(false);
+                                                adb.setMessage("Profile Picture uploaded");
+                                                adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        circle_profile.setImageURI(selectedImageUri);
+                                                    }
+                                                });
+                                                adb.show();
                                             } catch (Exception e) {
                                                 e.printStackTrace();
                                             }

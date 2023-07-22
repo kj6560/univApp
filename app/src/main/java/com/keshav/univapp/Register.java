@@ -112,6 +112,29 @@ public class Register extends Activity {
                                     adb.show();
                                 }
                             });
+                        }else{
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pb.setVisibility(View.INVISIBLE);
+                                    AlertDialog.Builder adb = new AlertDialog.Builder(Register.this);
+                                    try {
+                                        adb.setMessage(job.getString("message"));
+                                    } catch (JSONException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    adb.setCancelable(false);
+                                    adb.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                            Intent intent = new Intent(Register.this,MainActivity.class);
+                                            startActivity(intent);
+                                        }
+                                    });
+                                    adb.show();
+                                }
+                            });
                         }
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
